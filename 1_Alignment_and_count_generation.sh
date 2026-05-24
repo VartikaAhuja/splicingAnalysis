@@ -29,4 +29,5 @@ sed -i '1s/^/chr\tstart\tend\tgene\t<sample1>\t<sample2>\n/g' gene_counts.txt
 #sample2,path/to/sample2_stringtie.gtf
 
 # Prepare transcript-level counts using prepDE.py with a sample list
+#prepDE.py is a python script utility provided by Stringtie
 python prepDE.py -i samples.csv
