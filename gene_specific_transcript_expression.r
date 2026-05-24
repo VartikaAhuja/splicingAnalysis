@@ -2,6 +2,9 @@
 
 library(DESeq2)
 getwd()
+
+## Gene-level DESeq2 analysis
+# Read gene counts and sample metadata
 count_data=read.table("gene_counts.txt",sep="\t",header=TRUE,row.names="gene")
 #the first 3 columns for gene count data have chromosome, start and end information for genes
 count_data = count_data[,-c(1,2,3)]
@@ -12,9 +15,8 @@ rownames(col_data) = col_data$Sample
 all(colnames(count_data) %in% rownames(col_data))
 all(colnames(count_data) == rownames(col_data))
 
-dds = DESeqDataSetFromMatrix(countData = count_data,
-                               + colData = col_data,
-                               + design = ~ condition)      #features like stage, site and batch if available, they can be used here
+# Create DESeq2 dataset and run analysis
+dds = DESeqDataSetFromMatrix(countData = count_data, colData = col_data, design = ~ condition)      #features like stage, site and batch if available, they can be used here
 keep <- rowSums(counts(dds)) >= 10
 dds <- dds[keep,]
 dds$condition <- relevel(dds$condition, ref = "normal") 
@@ -32,7 +34,7 @@ head(res)
 resOrdered <- res[order(rownames(res)),]
 resFiltered <- subset(resOrdered,resOrdered$pvalue<0.05)
 
-#To check the upregulated genes among a pre-defined set of splicing factors for study; where genelist has those splicing factors list
+# Identify upregulated splicing factors from predefined gene list
 dat<- read.table("genelist",sep="\t",header=F,col.names="gene")
 resFiltered2 <- subset(resOrdered,rownames(resOrdered) %in% dat$gene)
 dim(resFiltered)
@@ -48,15 +50,15 @@ rm(count_data,dds,keep,rld,distsRL,mat,res,resOrdered,resFiltered,dat,resFiltere
 
 #DESeq2 for transcripts
 
+## Transcript-level DESeq2 analysis for downstream genes
+# Read transcript counts
 count_data = as.matrix(read.csv("transcript_count_matrix.csv",sep=",",row.names="transcript_id"))
 dim(count_data)
 rownames(col_data) = col_data$Sample
 all(colnames(count_data) %in% rownames(col_data))
 all(colnames(count_data) == rownames(col_data))
 
-dds = DESeqDataSetFromMatrix(countData = count_data,
-                               + colData = col_data,
-                               + design = ~ condition)
+dds = DESeqDataSetFromMatrix(countData = count_data, colData = col_data, design = ~ condition)
 keep <- rowSums(counts(dds)) >= 10
 dds <- dds[keep,]
 dds$condition <- relevel(dds$condition, ref = "normal") 
