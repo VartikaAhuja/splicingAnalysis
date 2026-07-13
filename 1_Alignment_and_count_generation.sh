@@ -2,8 +2,10 @@
 # Trim Illumina adapters and low-quality bases using TrimGalore or Cutadapt
 
 ## Align samples to the human reference genome
-# Build HISAT2 index from hg38.fa (prefix 'hg38' will be used to reference index files)
-hisat2-build hg38.fa hg38   #building an index of the reference genome hg38.fa and hg38 is the prefix in order to refer to the index files
+# Build splice-sites-aware HISAT2 index from hg38.fa (prefix 'hg38' will be used to reference index files)
+hisat2_extract_splice_sites.py gencode.v45.basic.annotation.gtf > hg38.ss
+hisat2_extract_exons.py gencode.v45.basic.annotation.gtf > hg38.exon
+hisat2-build -p 10 --ss hg38.ss --exon hg38.exon hg38.fa hg38   #building an index of the reference genome hg38.fa and hg38 is the prefix in order to refer to the index files
 
 # Align paired-end reads; --dta parameter is important, to use hisat aligned bam files for stringtie later
 hisat2 -x hg38 --dta -p 10 -1 <sample_R1_val_1>.fq.gz -2 <sample_R2_val_2>.fq.gz -S <sample>.sam
